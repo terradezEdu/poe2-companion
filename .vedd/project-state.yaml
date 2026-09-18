@@ -1,0 +1,22 @@
+methodology: VEDD
+version: 0.1
+
+project:
+  name: TODO
+  phase: intent_baseline
+
+active:
+  feature: null
+  slice: null
+
+milestones:
+  M0_intent_baseline: pending
+  M1_walking_skeleton: pending
+  M2_core_loop: pending
+  M3_functional_breadth: pending
+  M4_hardening: pending
+  M5_release_candidate: pending
+
+convergence:
+  last_audit: null
+  next_trigger: M1_walking_skeleton

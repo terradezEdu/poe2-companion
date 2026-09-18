@@ -1,0 +1,42 @@
+.vedd/
+  evidence-policy.yaml
+  project-state.yaml
+AGENTS.md
+FILE_TREE.txt
+README.md
+VEDD_Manual_v0.1.md
+docs/
+  vedd/
+    README.md
+    architecture.md
+    assistant-prompts.md
+    audits/
+      .gitkeep
+    capability-map.md
+    checklists.md
+    constitution.md
+    decisions/
+      .gitkeep
+    glossary.md
+    specs/
+      .gitkeep
+    visuals/
+      .gitkeep
+    workflow.md
+examples/
+  inventory-feature/
+    acceptance.feature
+    evidence.md
+    examples.md
+    spec.md
+scripts/
+  vedd_new_feature.py
+templates/
+  acceptance.template.feature
+  adr.template.md
+  convergence-audit.template.md
+  evidence.template.md
+  examples.template.md
+  qa.template.md
+  spec.template.md
+  visual-spec.template.md

@@ -1,0 +1,47 @@
+# Default VEDD evidence policy.
+# Adapt to project risk.
+
+levels:
+  E0:
+    name: prototype
+    required:
+      - manual_runtime_check
+
+  E1:
+    name: standard
+    required:
+      - acceptance_criteria
+      - relevant_unit_tests
+      - relevant_integration_check
+      - static_analysis
+
+  E2:
+    name: important
+    required:
+      - executable_acceptance
+      - unit_tests
+      - contract_or_integration_tests
+      - coverage_review
+      - architecture_fitness
+      - qa
+
+  E3:
+    name: critical
+    required:
+      - executable_acceptance
+      - unit_tests
+      - contract_and_integration_tests
+      - coverage_review
+      - architecture_fitness
+      - qa
+      - property_testing_when_applicable
+      - mutation_testing_when_applicable
+      - failure_negative_testing
+      - security_or_performance_when_relevant
+      - independent_review_or_test_generation
+
+defaults:
+  new_feature: E2
+  prototype: E0
+  low_risk_ui_polish: E1
+  auth_security_financial_destructive: E3
