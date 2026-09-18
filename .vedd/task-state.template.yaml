@@ -1,0 +1,55 @@
+# VEDD Task Runtime State
+# One file per active task:
+# .vedd/runtime/tasks/<task-id>.yaml
+
+version: "0.1"
+
+task:
+  id: null
+  title: null
+  feature: null
+
+  role: null
+  complexity: standard
+  evidence_level: null
+
+  status: planned
+
+  dependencies: []
+
+source:
+  github_issue: null
+
+execution:
+  executor: null
+  model: null
+  effort: null
+
+  session_id: null
+
+workspace:
+  branch: null
+  worktree: null
+
+progress:
+  completed: []
+  remaining: []
+
+evidence:
+  unit: not_run
+  acceptance: not_run
+  integration: not_run
+  static: not_run
+  architecture: not_run
+  visual: not_run
+
+blockers: []
+
+handoff:
+  summary: null
+  next_role: null
+
+timestamps:
+  started_at: null
+  updated_at: null
+  completed_at: null

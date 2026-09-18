@@ -1,47 +1,416 @@
-# Default VEDD evidence policy.
-# Adapt to project risk.
+# VEDD Evidence Policy
+# Canonical source of truth for evidence requirements.
+# Model selection belongs in .vedd/agent-policy.yaml.
+
+version: "0.2"
+
+policy:
+  principle: "evidence_proportional_to_risk"
+
+  # A feature/task inherits its feature evidence level unless explicitly overridden.
+  inheritance: feature_to_task
+
+  # A task may increase its evidence level without approval.
+  # Reducing evidence below the feature level requires an explicit Human Gate.
+  allow_automatic_upgrade: true
+  allow_automatic_downgrade: false
+
+  # Evidence must describe what was actually executed.
+  never_assume_pass: true
+  never_convert_not_run_to_pass: true
 
 levels:
+
   E0:
-    name: prototype
-    required:
-      - manual_runtime_check
+    name: Prototype
+    intent: >
+      Fast exploration where learning matters more than durable assurance.
+      Suitable for disposable prototypes, spikes and non-production experiments.
+
+    task_gate:
+      required:
+        - smoke
+      conditional:
+        - static
+
+      reviewer_required: false
+      human_gate_required: false
+
+    feature_gate:
+      required:
+        - smoke
 
   E1:
-    name: standard
-    required:
-      - acceptance_criteria
-      - relevant_unit_tests
-      - relevant_integration_check
-      - static_analysis
+    name: Standard
+    intent: >
+      Normal product work with limited blast radius and straightforward behavior.
+
+    task_gate:
+      required:
+        - static
+        - unit
+      conditional:
+        - acceptance
+        - integration
+        - visual
+
+      reviewer_required: false
+      human_gate_required: true
+
+    feature_gate:
+      required:
+        - static
+        - relevant_tests
 
   E2:
-    name: important
-    required:
-      - executable_acceptance
-      - unit_tests
-      - contract_or_integration_tests
-      - coverage_review
-      - architecture_fitness
-      - qa
+    name: Important
+    intent: >
+      User-visible or domain-important functionality where regressions would
+      materially affect the product.
+
+    task_gate:
+      required:
+        - static
+        - unit
+        - acceptance
+      conditional:
+        - integration
+        - contract
+        - visual
+        - data_validation
+
+      reviewer_required: true
+      human_gate_required: true
+
+    feature_gate:
+      required:
+        - static
+        - acceptance
+        - integration_or_contract
+        - independent_review
 
   E3:
-    name: critical
-    required:
-      - executable_acceptance
-      - unit_tests
-      - contract_and_integration_tests
-      - coverage_review
-      - architecture_fitness
-      - qa
-      - property_testing_when_applicable
-      - mutation_testing_when_applicable
-      - failure_negative_testing
-      - security_or_performance_when_relevant
-      - independent_review_or_test_generation
+    name: Critical
+    intent: >
+      High-impact behavior where failure could cause serious security,
+      financial, data-integrity, availability or irreversible user harm.
 
-defaults:
-  new_feature: E2
-  prototype: E0
-  low_risk_ui_polish: E1
-  auth_security_financial_destructive: E3
+    task_gate:
+      required:
+        - static
+        - unit
+        - acceptance
+        - integration_or_contract
+      conditional:
+        - property
+        - mutation
+        - fuzz
+        - security
+        - performance
+        - concurrency
+        - visual
+        - data_validation
+
+      reviewer_required: true
+      reviewer_independence_required: true
+      human_gate_required: true
+
+    feature_gate:
+      required:
+        - static
+        - acceptance
+        - integration_or_contract
+        - risk_specific_evidence
+        - independent_review
+        - human_gate
+
+evidence_types:
+
+  smoke:
+    description: >
+      Minimal proof that the changed system starts or the primary path can execute.
+
+  static:
+    description: >
+      Relevant formatter/lint/type/static-analysis checks required by the repository.
+
+  unit:
+    description: >
+      Focused tests for non-trivial implementation behavior introduced or changed.
+
+  acceptance:
+    description: >
+      Approved feature-level observable behavior represented by the Acceptance Contract.
+
+  integration:
+    description: >
+      Evidence that important collaborating components work together across boundaries.
+
+  contract:
+    description: >
+      Evidence that an external or internal interface satisfies its agreed contract.
+
+  visual:
+    description: >
+      Inspection or comparison of user-visible states against the approved Visual Spec.
+    applies_when:
+      - visual_behavior_changed
+      - approved_asset_changed
+      - layout_or_interaction_state_changed
+
+  data_validation:
+    description: >
+      Validation of structured domain/application data against schema and semantic rules.
+    applies_when:
+      - dataset_changed
+      - domain_records_changed
+      - source_or_verification_metadata_changed
+
+  property:
+    description: >
+      Property-based tests for invariants across broad input spaces.
+    applies_when:
+      - mathematical_or_domain_invariants
+      - parser_or_transform_logic
+      - combinatorial_input_space
+
+  mutation:
+    description: >
+      Mutation testing used selectively to assess whether important tests detect incorrect behavior.
+    applies_when:
+      - critical_business_logic
+      - high_confidence_required
+      - conventional_coverage_is_misleading
+
+  fuzz:
+    description: >
+      Fuzz testing for robustness against malformed or adversarial input.
+    applies_when:
+      - parser_or_decoder
+      - untrusted_input
+      - protocol_boundary
+
+  security:
+    description: >
+      Security-specific checks appropriate to the threat model.
+    applies_when:
+      - authentication
+      - authorization
+      - secrets
+      - untrusted_input
+      - sensitive_data
+      - externally_exposed_surface
+
+  performance:
+    description: >
+      Evidence against an approved performance requirement or meaningful regression risk.
+    applies_when:
+      - formal_performance_budget
+      - performance_sensitive_path
+      - significant_algorithmic_change
+
+  concurrency:
+    description: >
+      Evidence for race, ordering, idempotency or synchronization behavior.
+    applies_when:
+      - concurrent_state
+      - asynchronous_workflow
+      - distributed_or_parallel_execution
+
+risk_tags:
+
+  security:
+    raises_minimum_level_to: E3
+    activates:
+      - security
+
+  financial:
+    raises_minimum_level_to: E3
+    activates:
+      - property
+
+  irreversible-data:
+    raises_minimum_level_to: E3
+    activates:
+      - integration
+      - data_validation
+
+  authentication:
+    raises_minimum_level_to: E3
+    activates:
+      - security
+      - integration
+
+  external-contract:
+    raises_minimum_level_to: E2
+    activates:
+      - contract
+
+  persistence:
+    raises_minimum_level_to: E2
+    activates:
+      - integration
+      - data_validation
+
+  concurrency:
+    raises_minimum_level_to: E2
+    activates:
+      - concurrency
+
+  visual-critical:
+    raises_minimum_level_to: E2
+    activates:
+      - visual
+
+  data-quality:
+    raises_minimum_level_to: E2
+    activates:
+      - data_validation
+
+  performance-sensitive:
+    raises_minimum_level_to: E2
+    activates:
+      - performance
+
+status_values:
+  - pass
+  - fail
+  - not_run
+  - not_applicable
+  - blocked
+
+rules:
+
+  acceptance:
+    # Acceptance is required whenever approved observable behavior is changed
+    # at E1+, even if the level only lists it as conditional.
+    required_when:
+      - evidence_level_at_least_E1_and_observable_behavior_changed
+
+  unit:
+    # "Unit" does not mean every file requires a unit test.
+    not_required_for:
+      - pure_documentation_change
+      - generated_static_asset_only
+      - configuration_change_with_no_logic
+    unless:
+      - regression_risk_requires_it
+
+  integration:
+    required_when:
+      - multiple_components_change_together
+      - persistence_boundary_changed
+      - external_service_boundary_changed
+      - feature_integration_task
+
+  visual:
+    required_when:
+      - approved_visual_behavior_changed
+      - production_asset_changed
+    evidence_may_include:
+      - human_visual_review
+      - screenshot_comparison
+      - visual_regression_test
+
+  data_validation:
+    required_when:
+      - bundled_dataset_changed
+      - domain_schema_changed
+      - curated_domain_data_changed
+
+  independent_review:
+    required_for:
+      - E2
+      - E3
+    reviewer_should_not_be:
+      - primary_implementer_session
+
+  failed_required_evidence:
+    blocks_task_completion: true
+    blocks_feature_gate: true
+
+  blocked_required_evidence:
+    blocks_task_completion: true
+    requires_escalation: true
+
+  not_applicable:
+    requires_reason: true
+
+gates:
+
+  task_ready_for_human_review:
+    require:
+      - all_required_task_evidence_pass_or_not_applicable
+      - no_unreported_failed_checks
+      - handoff_present
+
+  feature_ready_for_merge:
+    require:
+      - all_feature_required_evidence_pass
+      - all_required_task_dependencies_complete
+      - no_blocking_review_findings
+      - human_gate_when_required
+
+reporting:
+
+  artifact: "docs/vedd/specs/<feature>/evidence.md"
+
+  per_check_fields:
+    - type
+    - scope
+    - status
+    - command_or_method
+    - result_summary
+    - timestamp
+    - notes
+
+  task_runtime_summary:
+    storage: git-common-dir
+    path: "vedd/runtime/tasks/<task-id>.yaml"
+    rule: >
+      Runtime state stores only the current evidence summary/status.
+      Durable evidence detail belongs in the feature evidence artifact or CI output.
+
+  required_handoff_fields:
+    - checks_executed
+    - checks_not_executed
+    - failed_checks
+    - blocked_checks
+    - residual_risks
+
+examples:
+
+  css_spacing_change:
+    suggested_level: E1
+    risk_tags: []
+    expected:
+      - static
+      - visual
+
+  campaign_map:
+    suggested_level: E2
+    risk_tags:
+      - visual-critical
+      - data-quality
+    expected:
+      - static
+      - unit
+      - acceptance
+      - integration
+      - visual
+      - data_validation
+      - independent_review
+
+  authentication:
+    suggested_level: E3
+    risk_tags:
+      - authentication
+      - security
+    expected:
+      - static
+      - unit
+      - acceptance
+      - integration
+      - security
+      - independent_review
+      - human_gate

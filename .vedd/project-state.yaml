@@ -1,22 +1,118 @@
-methodology: VEDD
-version: 0.1
+# VEDD Project State
+# Durable, project-level state only.
+# Volatile per-task execution state belongs in .vedd/runtime/tasks/<task-id>.yaml.
+
+version: "0.1"
 
 project:
-  name: TODO
-  phase: intent_baseline
+  name: poe2-companion
+  methodology: VEDD
+  state: active
 
 active:
-  feature: null
-  slice: null
+  feature: campaign-map
+  phase: example-mapping
 
-milestones:
-  M0_intent_baseline: pending
-  M1_walking_skeleton: pending
-  M2_core_loop: pending
-  M3_functional_breadth: pending
-  M4_hardening: pending
-  M5_release_candidate: pending
+features:
 
-convergence:
-  last_audit: null
-  next_trigger: M1_walking_skeleton
+  campaign-map:
+    title: Campaign Map
+    evidence_level: E2
+
+    phase: example-mapping
+    status: active
+
+    contract:
+      product_decisions:
+        path: docs/vedd/specs/context/product-decisions.md
+        status: approved
+
+      spec:
+        path: docs/vedd/specs/campaign-map/spec.md
+        status: approved
+
+      visual_spec:
+        path: docs/vedd/specs/campaign-map/visual-spec.md
+        status: approved
+
+      examples:
+        path: docs/vedd/specs/campaign-map/examples.md
+        status: draft
+
+      acceptance:
+        path: docs/vedd/specs/campaign-map/acceptance.feature
+        status: draft
+
+    gates:
+      specification:
+        status: approved
+        blockers: 0
+
+      example_mapping:
+        status: pending
+
+      acceptance:
+        status: pending
+
+      implementation:
+        status: pending
+
+      merge:
+        status: pending
+
+    deferred:
+      - multiple_datasets
+      - runtime_dataset_selection
+      - cross_act_connections
+      - automatic_freshness_rules
+      - conflicting_source_resolution
+      - dataset_migrations
+      - formal_performance_budget
+      - detailed_danger_scoring
+
+    tasks: []
+
+workflow:
+  phases:
+    - discovery
+    - specification
+    - example-mapping
+    - acceptance
+    - planning
+    - implementation
+    - hardening
+    - review
+    - merge
+    - convergence
+    - done
+
+  task_statuses:
+    - planned
+    - ready
+    - in_progress
+    - interrupted
+    - blocked
+    - waiting_human_review
+    - done
+    - cancelled
+
+  artifact_statuses:
+    - draft
+    - review
+    - approved
+    - locked
+
+runtime:
+  storage: git-common-dir
+  directory: vedd/runtime/tasks
+  task_state_template: .vedd/task-state.template.yaml
+
+policies:
+  agents: .vedd/agent-policy.yaml
+  evidence: .vedd/evidence-policy.yaml
+
+rules:
+  project_state_is_durable: true
+  runtime_state_is_per_task: true
+  agents_must_not_write_global_state_concurrently: true
+  human_merge_gate: true

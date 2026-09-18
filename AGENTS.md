@@ -2,262 +2,380 @@
 
 This repository follows **VEDD — Visual Evidence-Driven Development**.
 
-This file defines mandatory operating rules for AI coding assistants.
+This file contains the universal rules that apply to every AI agent working in this repository.
+
+Role-specific behavior is defined separately under:
+
+```text
+docs/vedd/roles/
+```
 
 ---
 
-# 1. Authority
+# 1. Progressive context
+
+Do not load the entire VEDD documentation by default.
+
+Use progressive context disclosure:
+
+```text
+AGENTS.md
+    ↓
+docs/vedd/roles.md
+    ↓
+active role definition
+    ↓
+assigned task / feature
+    ↓
+relevant approved contract
+    ↓
+additional context only when required
+```
+
+Every agent MUST:
+
+1. read this file;
+2. identify its assigned role;
+3. read `docs/vedd/roles.md`;
+4. read only its active role file;
+5. load only the feature/task context required to perform that role.
+
+Do not read every role definition unless explicitly performing methodology or project-wide audit work.
+
+---
+
+# 2. One active role
+
+Every agent operates under exactly one primary VEDD role.
+
+An agent MUST NOT silently switch roles.
+
+If work requires a different role:
+
+1. stop the current role;
+2. report the required handoff;
+3. invoke the appropriate role separately.
+
+Example:
+
+```text
+Challenger
+→ Context Reconciler
+→ Human Gate
+```
+
+not:
+
+```text
+Challenger
+→ edits Spec
+→ implements feature
+→ reviews own implementation
+```
+
+---
+
+# 3. Authority
 
 The default source-of-truth hierarchy is:
 
-1. Human-approved product intent / constitution
-2. Human-approved feature specification
-3. Human-approved acceptance rules and examples
-4. Architectural decisions / constraints
-5. Executable acceptance tests
-6. Implementation plan
-7. Internal unit tests
-8. Existing code
+1. Human-approved Constitution / Product Intent
+2. Human-approved Product Decisions
+3. Approved Feature Spec
+4. Approved Visual Spec
+5. Approved Examples
+6. Approved Acceptance Contract
+7. Architectural Decisions / Constraints
+8. Implementation Plan
+9. Internal Tests
+10. Existing Code
 
 Existing code is not automatically the source of truth.
 
-If code conflicts with approved intent, report the conflict.
+If implementation conflicts with a higher-authority artifact, report the conflict.
 
 ---
 
-# 2. Protected artifacts
+# 4. Protected artifacts
 
-The following are protected by default:
+Approved VEDD artifacts are protected by default.
 
-- `docs/vedd/constitution.md`
-- approved `spec.md`
-- approved `visual-spec.md`
-- approved acceptance rules
-- approved `.feature` files
-- important business invariants
-- architectural constraints / ADRs
+Examples:
 
-You MUST NOT modify protected artifacts merely to make implementation or tests pass.
+```text
+docs/vedd/constitution.md
+approved spec.md
+approved visual-spec.md
+approved examples.md
+approved acceptance.feature
+approved product decisions
+approved ADRs
+```
 
-If a protected artifact appears wrong, contradictory or outdated:
+A role may modify a protected artifact only when its role definition explicitly grants permission and the artifact is in a modifiable state.
 
-1. explain the conflict;
-2. propose the smallest correction;
-3. wait for human approval when the change affects intent.
+NEVER modify a protected artifact merely to:
 
----
+* make implementation easier;
+* make a test pass;
+* fit existing code;
+* remove an inconvenient requirement.
 
-# 3. Before implementation
-
-Before changing code, you MUST:
-
-1. read `docs/vedd/constitution.md`;
-2. read `docs/vedd/workflow.md`;
-3. identify the active feature/slice;
-4. read its `spec.md`;
-5. read its `visual-spec.md` if applicable;
-6. read `examples.md`;
-7. read `acceptance.feature`;
-8. identify affected module/service contracts;
-9. identify unresolved questions;
-10. identify the required evidence level;
-11. report material contradictions or ambiguity before coding.
-
-Do not silently invent product behaviour when the specification has a material ambiguity.
+If a protected artifact appears wrong or contradictory, escalate.
 
 ---
 
-# 4. Specification assistance
+# 5. Material ambiguity
 
-When helping define or improve a spec:
+Do not silently invent product behavior.
 
-- preserve stated human intent;
-- separate WHAT from HOW;
-- identify missing states;
-- identify edge cases;
-- identify hidden assumptions;
-- identify contradictions;
-- identify missing capabilities;
-- identify capabilities that appear unnecessary;
-- identify failure behaviour;
-- identify integration assumptions;
-- identify untestable requirements;
-- mark unresolved questions explicitly.
+An ambiguity is material when:
 
-Do not disguise implementation preference as product requirement.
+> Two reasonable implementations could produce observably different behavior within the approved current scope.
+
+When material ambiguity exists:
+
+1. preserve valid completed work;
+2. identify the conflicting artifacts;
+3. explain the observable consequence;
+4. escalate according to the active role.
+
+Explicitly deferred requirements are not blockers for the current scope.
 
 ---
 
-# 5. Test design
+# 6. Scope
 
-Before implementing important behaviour:
+Stay within the assigned task and approved current scope.
 
-1. derive examples from rules;
-2. include positive and negative cases;
-3. include relevant boundaries;
-4. identify invariants suitable for property-based tests;
-5. identify module/service contracts;
-6. derive executable acceptance evidence from approved intent;
-7. avoid unnecessary coupling to internal implementation structure.
+Do not introduce future functionality unless explicitly requested.
 
-A feature-level test should normally verify observable behaviour, not private method names.
+Avoid:
 
----
+* speculative abstractions;
+* unrelated refactors;
+* unused APIs;
+* premature extensibility;
+* opportunistic cleanup outside the task.
 
-# 6. Implementation behaviour
-
-During implementation:
-
-- work in the smallest coherent connected slice;
-- preserve the Walking Skeleton;
-- prioritize the Weakest Critical Path;
-- prefer existing project patterns;
-- avoid speculative abstractions;
-- avoid unused endpoints/classes/interfaces;
-- add internal unit tests for non-trivial behaviour;
-- integrate continuously;
-- keep changes within expected scope;
-- report unavoidable scope expansion.
-
-Do not complete one subsystem in isolation while postponing all important integration.
+Prefer the smallest coherent change that preserves the connected system.
 
 ---
 
-# 7. Weakest Critical Path
+# 7. Walking Skeleton
 
-Do not automatically choose the least-developed module.
+Keep the system working end-to-end as it grows.
 
-Prefer work that reduces the most important combination of:
+Do not complete isolated subsystems while postponing critical integration.
 
-- user-value blockage;
-- dependency blockage;
-- integration risk;
-- uncertainty;
-- architectural risk;
-- evidence gap;
-- prolonged neglect.
+When selecting or planning work, prefer slices that strengthen the current **Weakest Critical Path**.
 
-When proposing the next slice, explain the reason in terms of these dimensions.
+Detailed planning rules belong to the relevant VEDD role.
 
 ---
 
-# 8. Failure handling
+# 8. Evidence
 
-If an approved acceptance test fails, DO NOT weaken the expectation.
+Never fabricate evidence.
 
-Classify the cause:
+An agent MUST NOT claim that:
 
-A. implementation is wrong  
-B. test implementation is wrong  
-C. specification is ambiguous  
-D. approved behaviour has changed
+* a test passed when it was not executed;
+* a visual state was reviewed when it was not inspected;
+* a source was verified when it was not checked;
+* a requirement was approved without a Human Gate.
 
-For C or D, escalate to specification review.
+Required evidence is determined by:
 
----
+```text
+.vedd/evidence-policy.yaml
+```
 
-# 9. Completion protocol
+and the assigned task/role.
 
-Before claiming a slice is complete:
-
-1. run required unit tests;
-2. run acceptance tests;
-3. run relevant contract/integration tests;
-4. run required static/type/architecture gates;
-5. verify relevant visual states;
-6. run risk-specific checks when required;
-7. produce an evidence summary;
-8. list known risks;
-9. list anything not verified;
-10. list spec deviations, if any;
-11. list major files/areas changed.
-
-NEVER claim a check passed unless it was actually executed.
+When evidence cannot be executed, state that explicitly.
 
 ---
 
-# 10. Evidence strength
+# 9. Acceptance failures
 
-Confidence should come from multiple partially independent sources.
+Never weaken approved Acceptance merely because implementation fails.
 
-Increasing strength:
+If approved Acceptance fails, determine whether the cause is:
 
-1. code compiles/runs;
-2. implementer's own unit tests pass;
-3. approved acceptance examples pass;
-4. contract/integration tests pass;
-5. property/mutation/fuzz testing attempts to break assumptions;
-6. external QA/human exploration confirms behaviour.
+```text
+A. implementation defect
+B. test implementation defect
+C. specification ambiguity
+D. approved behavior has changed
+```
 
-Not every feature needs every level.
+For `C` or `D`, escalate upstream.
 
----
-
-# 11. Risk-targeted human review
-
-Recommend direct human code review when changes involve:
-
-- authentication/authorization;
-- security-sensitive operations;
-- financial logic;
-- destructive migrations;
-- concurrency;
-- cryptography;
-- unsafe system operations;
-- complex algorithms;
-- broad architectural changes;
-- evidence that is weak or contradictory.
+Do not rewrite the contract to match accidental implementation behavior.
 
 ---
 
-# 12. Convergence behaviour
+# 10. Human authority
 
-At convergence milestones, switch from feature addition to simplification.
+Agents may:
 
-Search for:
+* analyze;
+* recommend;
+* challenge;
+* implement within role authority;
+* generate evidence.
 
-- dead code;
-- unused endpoints;
-- duplicate logic;
-- speculative abstractions;
-- stale tests;
-- dependency cycles;
-- boundary violations;
-- obsolete feature flags;
-- redundant models;
-- spec/code drift.
+Agents MUST NOT represent their own decisions as human approval.
 
-Do not refactor only for style. Prioritize measurable simplification.
+Human approval is required where the workflow defines a Human Gate.
+
+In particular, human approval remains the default authority for:
+
+* product intent;
+* contract lock;
+* important product decisions;
+* subjective visual asset selection;
+* merge.
 
 ---
 
-# 13. Default response format after implementation
+# 11. Git and worktrees
 
-Use this structure:
+Implementation tasks should normally follow:
+
+```text
+one task
+=
+one branch
+=
+one worktree
+=
+one primary Implementer
+```
+
+Unless explicitly authorized otherwise, AI implementation agents MUST NOT:
+
+```text
+commit
+push
+merge
+```
+
+Leave implementation changes available for review.
+
+The human remains the default merge authority.
+
+---
+
+# 12. Recoverability
+
+Agents are disposable.
+
+Tasks are durable.
+
+Do not rely on conversation memory as the only record of progress.
+
+Long-running work SHOULD remain recoverable from:
+
+```text
+VEDD artifacts
++
+task / GitHub Issue
++
+Git branch/worktree
++
+git status / diff
++
+evidence state
+```
+
+When resuming interrupted work:
+
+1. inspect existing task state;
+2. inspect `git status`;
+3. inspect the current diff;
+4. determine what is already complete;
+5. continue instead of blindly restarting.
+
+---
+
+# 13. Handoff
+
+At the end of a role pass, leave enough durable information for another agent to continue.
+
+Use a concise handoff:
 
 ```markdown
-## Implemented
+## Role
+...
+
+## Result
+...
+
+## Artifacts changed
 - ...
 
 ## Evidence
-- Unit: ...
-- Acceptance: ...
-- Integration/contracts: ...
-- Static/type/architecture: ...
-- Other: ...
+- ...
 
-## Not verified
+## Open questions
 - ...
 
 ## Known risks
 - ...
 
-## Spec impact
-- None / ...
+## Recommended next role
+...
 ```
+
+Do not depend on hidden conversation context for critical project state.
 
 ---
 
-# 14. Core rule
+# 14. Context discipline
+
+More context is not automatically better.
+
+Load:
+
+```text
+REQUIRED
+→ always
+
+OPTIONAL
+→ only when necessary
+
+UNRELATED
+→ do not load
+```
+
+A task-specific agent should normally not load:
+
+* unrelated feature Specs;
+* every Challenger report;
+* every role definition;
+* the complete VEDD manual;
+* historical project discussions;
+
+unless they are genuinely required.
+
+The goal is to minimize both token usage and decision noise.
+
+---
+
+# 15. Core rules
+
+> Preserve approved intent.
+
+> Use one role at a time.
+
+> Escalate material ambiguity.
+
+> Never weaken the contract to fit generated code.
+
+> Never fabricate evidence.
+
+> Load only the context needed for the current role.
 
 > No important software claim should depend only on trust in generated code.

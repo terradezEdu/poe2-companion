@@ -1,0 +1,271 @@
+```yaml
+# VEDD Agent Policy
+# Operational mapping between VEDD roles and execution models.
+# Role permissions live in docs/vedd/roles/*.md, not here.
+
+version: "0.1"
+
+policy:
+  # Never silently substitute a different model for a role.
+  auto_fallback: false
+
+  # A model change must be visible in task/runtime state.
+  record_runtime_selection: true
+
+  # Prefer the cheapest configuration that is appropriate for the role.
+  optimization_goal: "quality_at_minimum_reasonable_cost"
+
+defaults:
+  provider: openai
+  executor: codex
+  model: gpt-5.6-luna
+  effort: medium
+  sandbox: workspace-write
+
+models:
+  luna:
+    id: gpt-5.6-luna
+    purpose: high-volume implementation and routine engineering
+
+  terra:
+    id: gpt-5.6-terra
+    purpose: balanced analysis, data and medium-complexity engineering
+
+  sol:
+    id: gpt-5.6-sol
+    purpose: complex reasoning, specification, planning and independent review
+
+roles:
+
+  specifier:
+    model: gpt-5.6-sol
+    effort: high
+    mode: reasoning
+
+  challenger:
+    model: gpt-5.6-sol
+    effort: high
+    mode: reasoning
+
+  context-reconciler:
+    model: gpt-5.6-sol
+    effort: medium
+    mode: reasoning
+
+  example-designer:
+    model: gpt-5.6-terra
+    effort: medium
+    mode: reasoning
+
+  acceptance-designer:
+    model: gpt-5.6-terra
+    effort: medium
+    mode: reasoning
+
+  planner:
+    model: gpt-5.6-sol
+    effort: medium
+    mode: reasoning
+
+  visual-director:
+    model: gpt-5.6-sol
+    effort: medium
+    mode: multimodal-reasoning
+
+  asset-designer:
+    executor: image-generation
+    mode: image
+    human_gate: required
+
+  implementer:
+    model: gpt-5.6-luna
+    effort: medium
+    mode: coding
+
+  hardener:
+    model: gpt-5.6-luna
+    effort: medium
+    mode: coding
+
+  reviewer:
+    model: gpt-5.6-sol
+    effort: medium
+    mode: reasoning
+
+  convergence-auditor:
+    model: gpt-5.6-sol
+    effort: high
+    mode: reasoning
+
+  weakest-critical-path-analyst:
+    model: gpt-5.6-sol
+    effort: medium
+    mode: reasoning
+
+  data-curator:
+    model: gpt-5.6-terra
+    effort: medium
+    mode: research-data
+
+  visual-reviewer:
+    model: gpt-5.6-sol
+    effort: medium
+    mode: multimodal-reasoning
+
+complexity_overrides:
+
+  implementer:
+    trivial:
+      model: gpt-5.6-luna
+      effort: low
+
+    standard:
+      model: gpt-5.6-luna
+      effort: medium
+
+    complex:
+      model: gpt-5.6-luna
+      effort: high
+
+    architecture-sensitive:
+      model: gpt-5.6-terra
+      effort: high
+
+  hardener:
+    standard:
+      model: gpt-5.6-luna
+      effort: medium
+
+    complex:
+      model: gpt-5.6-terra
+      effort: medium
+
+evidence_overrides:
+
+  E0:
+    reviewer_required: false
+
+  E1:
+    reviewer_required: false
+
+  E2:
+    reviewer_required: true
+    reviewer_role: reviewer
+
+  E3:
+    reviewer_required: true
+    reviewer_role: reviewer
+    reviewer_effort: high
+    human_gate: required
+
+escalation:
+
+  implementer:
+    # Escalate capability only when the current configuration is genuinely stuck.
+    sequence:
+      - model: gpt-5.6-luna
+        effort: medium
+      - model: gpt-5.6-luna
+        effort: high
+      - model: gpt-5.6-terra
+        effort: medium
+      - model: gpt-5.6-sol
+        effort: medium
+
+    escalate_on:
+      - repeated_failed_attempts
+      - unresolved_debugging
+      - architecture_uncertainty
+      - task_scope_exceeds_current_model
+
+    max_failed_attempts_before_escalation: 2
+
+  reviewer:
+    sequence:
+      - model: gpt-5.6-sol
+        effort: medium
+      - model: gpt-5.6-sol
+        effort: high
+
+context_policy:
+
+  strategy: progressive-disclosure
+
+  always_load:
+    - AGENTS.md
+    - docs/vedd/roles.md
+    - active_role
+
+  load_when_relevant:
+    - assigned_task
+    - approved_feature_spec
+    - approved_examples
+    - approved_acceptance
+    - relevant_architecture
+    - relevant_domain_context
+    - relevant_visual_context
+    - git_diff
+    - evidence_report
+
+  never_load_by_default:
+    - all_role_files
+    - unrelated_feature_specs
+    - complete_vedd_manual
+    - historical_challenger_reports
+    - unrelated_project_history
+
+concurrency:
+
+  enabled: true
+
+  default_max_parallel_implementers: 3
+
+  require_separate_worktree: true
+
+  prevent_parallel_when:
+    - overlapping_write_scope
+    - unresolved_dependency
+    - shared_protected_artifact
+    - architecture_decision_pending
+
+runtime:
+  storage: git-common-dir
+  directory: vedd/runtime/tasks
+
+  resumable: true
+
+  on_interruption:
+    - preserve_worktree
+    - preserve_git_diff
+    - record_completed_work
+    - record_remaining_work
+    - record_evidence_state
+
+  on_resume:
+    - inspect_task_state
+    - inspect_git_status
+    - inspect_git_diff
+    - continue_completed_work_without_restarting
+
+git:
+
+  agent_commit: false
+  agent_push: false
+  agent_merge: false
+
+  human_merge_gate: true
+
+review:
+
+  prefer_independent_agent: true
+
+  review_context:
+    - approved_spec
+    - approved_examples
+    - approved_acceptance
+    - relevant_architecture
+    - evidence_report
+    - git_diff
+
+  avoid_full_repo_context_when_possible: true
+```
