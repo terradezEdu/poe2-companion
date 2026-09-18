@@ -1,4 +1,3 @@
-```yaml
 # VEDD Agent Policy
 # Operational mapping between VEDD roles and execution models.
 # Role permissions live in docs/vedd/roles/*.md, not here.
@@ -140,24 +139,6 @@ complexity_overrides:
       model: gpt-5.6-terra
       effort: medium
 
-evidence_overrides:
-
-  E0:
-    reviewer_required: false
-
-  E1:
-    reviewer_required: false
-
-  E2:
-    reviewer_required: true
-    reviewer_role: reviewer
-
-  E3:
-    reviewer_required: true
-    reviewer_role: reviewer
-    reviewer_effort: high
-    human_gate: required
-
 escalation:
 
   implementer:
@@ -268,4 +249,3 @@ review:
     - git_diff
 
   avoid_full_repo_context_when_possible: true
-```

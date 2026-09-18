@@ -26,6 +26,9 @@ Before acting:
 | Hardener | `roles/hardener.md` |
 | Reviewer | `roles/reviewer.md` |
 | Convergence Auditor | `roles/convergence-auditor.md` |
+| Data Curator | `roles/data-curator.md` |
+| Visual Reviewer | `roles/visual-reviewer.md` |
+| Weakest Critical Path Analyst | `roles/weakest-critical-path.md` |
 
 An agent MUST NOT read every role unless explicitly performing
 methodology/audit work.

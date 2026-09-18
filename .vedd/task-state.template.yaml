@@ -1,6 +1,6 @@
 # VEDD Task Runtime State
 # One file per active task:
-# .vedd/runtime/tasks/<task-id>.yaml
+# <git-common-dir>/vedd/runtime/tasks/<task-id>.yaml
 
 version: "0.1"
 

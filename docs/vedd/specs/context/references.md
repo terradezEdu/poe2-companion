@@ -17,16 +17,16 @@ Official Path of Exile 2 material
 
 ### Product target
 
-target-map-layout.png
+visuals/mockup-1.png
 - Primary reference for map layout.
 - Represents selected area + detail panel.
 - This is our intended product direction.
 
-target-area-details.png
+visuals/mockup-2.png
 - Primary reference for richer boss/reward information hierarchy.
 
 ### Domain references
 
-reference-poe2-map-*.png
+visuals/Poe2-screenshot-map01.png and visuals/Poe2-screenshot-map02.png
 - Used only to understand PoE2 campaign-map navigation and visual language.
 - Not a pixel-perfect implementation target.

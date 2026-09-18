@@ -1,6 +1,6 @@
 # VEDD Project State
 # Durable, project-level state only.
-# Volatile per-task execution state belongs in .vedd/runtime/tasks/<task-id>.yaml.
+# Volatile per-task execution state belongs in <git-common-dir>/vedd/runtime/tasks/<task-id>.yaml.
 
 version: "0.1"
 
