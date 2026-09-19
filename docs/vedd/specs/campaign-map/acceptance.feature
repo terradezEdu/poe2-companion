@@ -190,6 +190,19 @@ Feature: Consult the Act 1 campaign map
       Then "Jefe Alfa" is shown as "Verificado"
       And its weakness is shown as "Desconocida"
 
+    # Trace: examples.md Rule 9, Example 4
+    Scenario: Normalize source-less verification without changing optional knowledge
+      Given "Jefe Alfa" declares verification "VERIFIED" without an accepted source
+      And the weakness of "Jefe Alfa" is unknown
+      And the rewards of "Jefe Alfa" are verified absent
+      When the player selects the area containing "Jefe Alfa"
+      Then "Jefe Alfa" is shown as "Sin verificar"
+      And "Jefe Alfa" is not shown as "Verificado"
+      And its weakness is shown as "Desconocida"
+      And its rewards are shown as "Ninguna"
+      And the Act 1 map remains available
+      And no global campaign information error is shown
+
   Rule: Structurally invalid campaign information prevents partial display
 
     # Trace: examples.md Rule 11, Example 1 (all seven invalid fixtures)

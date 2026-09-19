@@ -275,6 +275,22 @@ verification dates.
 **Expected outcome:** Each source and date is associated with its owning area or
 boss record; neither is visually attributed to the other record.
 
+## Example 4 — Source-less verification is normalized without changing knowledge
+
+**Context:** Jefe Alfa declares `VERIFIED` without an accepted source, has an
+`UNKNOWN` weakness, and has verified-absent rewards.
+
+**Action:** The player selects the area containing Jefe Alfa.
+
+**Expected outcome:**
+
+- Jefe Alfa's verification is normalized to `UNKNOWN` and displays
+  `Sin verificar`;
+- the campaign map remains usable and Jefe Alfa remains available in its own
+  boss block without a global dataset error;
+- the weakness remains unknown and displays `Desconocida`; and
+- the verified-absent rewards remain verified absent and display `Ninguna`.
+
 ---
 
 # Rule 10 — Internal status values are localized in Spanish

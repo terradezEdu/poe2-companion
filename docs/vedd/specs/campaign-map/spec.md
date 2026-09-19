@@ -215,6 +215,12 @@ in English, but the UI MUST use these mappings:
 21. **Sources.** Each area and boss record MUST associate its own available
     sources and optional verification date with that record. A `VERIFIED`
     record MUST have at least one accepted source.
+
+    If a record declares `VERIFIED` without at least one accepted source,
+    its verification status MUST be normalized to `UNKNOWN`.
+
+    This condition is not a structural dataset error and MUST NOT suppress
+    the campaign map.
 22. **Game-data version.** The bundled dataset's game-data version MUST be
     available in the campaign-map experience. If its value is not established,
     it is displayed as `Desconocido`.
@@ -258,6 +264,7 @@ as `Desconocido`.
 | Optional element verified absent | Keep the map usable and show the affected value as `Ninguno`. |
 | Area or boss record is `VERIFIED` but an optional value is unknown | Show record status `Verificado` and the affected value as `Desconocido`. |
 | Area or boss record verification is `UNKNOWN` | Show `Sin verificar` for that record. |
+| `VERIFIED` record with no accepted source | Keep the dataset usable, normalize that record's verification to `UNKNOWN`, and display `Sin verificar`. |
 
 There are no separate empty-dataset, empty-Act, or partially recovered-map
 states in v0.1; those structural conditions produce the global dataset error.
