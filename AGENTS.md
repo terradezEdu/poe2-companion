@@ -379,3 +379,22 @@ The goal is to minimize both token usage and decision noise.
 > Load only the context needed for the current role.
 
 > No important software claim should depend only on trust in generated code.
+
+## EVIDENCE INTEGRITY RULE
+
+When an evidence test fails, never change, weaken, skip, delete, or reinterpret
+the test merely to make the current implementation pass.
+
+First determine whether the test faithfully represents the approved contract.
+
+A contract-derived evidence test may only be changed when the change is justified
+by the approved contract itself or by an explicit human-approved contract change.
+
+Existing code, implementation convenience, current UI behavior, test failures,
+or the desire to obtain a green check are never valid justification for changing
+contract-derived evidence.
+
+Any modification to contract-derived evidence must:
+> identify the contract rule/scenario that justifies the change;
+> explain why the previous test did not faithfully represent that contract;
+> be reported explicitly in the handoff.

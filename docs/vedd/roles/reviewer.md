@@ -49,6 +49,7 @@ Do not modify:
 - incorrect or weak tests
 - visual-spec drift when relevant
 - security/risk issues relevant to scope
+- verify that evidence was not weakened or adapted to match the implementation.
 
 ## Finding levels
 - `BLOCKER`
