@@ -1,7 +1,8 @@
 # Example Mapping — campaign-map v0.1
 
-**Status:** Draft — ready for human review  
-**Based on:** Approved `spec.md` and `visual-spec.md`  
+**Status:** LOCKED — v0.1
+**Readiness:** Contract locked — ready for Planning
+**Based on:** Locked `spec.md` and `visual-spec.md`
 **Scope:** Observable v0.1 behaviour only
 
 The names `Área A`, `Área B`, `Jefe Alfa`, and `Jefe Beta` are neutral
@@ -10,9 +11,10 @@ fixture labels. They do not assert facts about the Path of Exile 2 campaign.
 Explicitly deferred capabilities and non-blocking visual latitude are not
 covered.
 
-## Stattus
+## Status
 
-APPROVED — v0.1
+LOCKED — v0.1
+Contract locked — ready for Planning.
 
 ---
 
@@ -217,6 +219,21 @@ reward.
 - the boss field displays `Jefe: Ninguno`;
 - the rewards field displays `Recompensas: Ninguna`;
 - neither field is displayed as `Desconocido`.
+
+## Example 4 — Optional boss fact: unknown differs from verified absence
+
+**Context:** Jefe Alfa's weaknesses have not been sufficiently established.
+Jefe Beta's weaknesses have been checked and none are present.
+
+**Action:** The player selects the area containing both bosses.
+**Expected outcome:**
+
+- Jefe Alfa's weaknesses display the appropriate plural form of
+  `Desconocido`;
+- Jefe Beta's weaknesses display the appropriate plural form of `Ninguno`;
+- both fields remain visible rather than being blank; and
+- neither boss's knowledge state changes the other boss's record or the
+  area's usability.
 
 ---
 

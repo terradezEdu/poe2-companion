@@ -1,12 +1,13 @@
 # Visual Spec — campaign-map
 
-**Status:** Draft — reconciled with approved v0.1 decisions  
-**Readiness:** Ready for Example Mapping review  
-**Owner:** Human project owner (confirmation pending)
+**Status:** LOCKED — v0.1
+**Readiness:** Contract locked — ready for Planning
+**Owner:** Human project owner
 
 ## Status
 
-APPROVED — v0.1
+LOCKED — v0.1
+Contract locked — ready for Planning.
 
 ---
 

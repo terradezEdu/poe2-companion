@@ -1,14 +1,14 @@
 # Feature Spec — campaign-map
 
-**Status:** Draft — reconciled with approved v0.1 decisions  
-**Readiness:** Ready for Example Mapping review  
-**Evidence level:** E2  
-**Owner:** Human project owner (confirmation pending)
+**Status:** LOCKED — v0.1
+**Readiness:** Contract locked — ready for Planning
+**Evidence level:** E2
+**Owner:** Human project owner
 
 ## Status
 
-APPROVED — v0.1
-Approved for Example Mapping.
+LOCKED — v0.1
+Contract locked — ready for Planning.
 ---
 
 # 0. Authority and specification basis

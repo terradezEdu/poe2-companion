@@ -11,7 +11,7 @@ project:
 
 active:
   feature: campaign-map
-  phase: example-mapping
+  phase: planning
 
 features:
 
@@ -19,29 +19,29 @@ features:
     title: Campaign Map
     evidence_level: E2
 
-    phase: example-mapping
+    phase: planning
     status: active
 
     contract:
       product_decisions:
         path: docs/vedd/specs/context/product-decisions.md
-        status: approved
+        status: locked
 
       spec:
         path: docs/vedd/specs/campaign-map/spec.md
-        status: approved
+        status: locked
 
       visual_spec:
         path: docs/vedd/specs/campaign-map/visual-spec.md
-        status: approved
+        status: locked
 
       examples:
         path: docs/vedd/specs/campaign-map/examples.md
-        status: draft
+        status: locked
 
       acceptance:
         path: docs/vedd/specs/campaign-map/acceptance.feature
-        status: draft
+        status: locked
 
     gates:
       specification:
@@ -49,10 +49,10 @@ features:
         blockers: 0
 
       example_mapping:
-        status: pending
+        status: approved
 
       acceptance:
-        status: pending
+        status: approved
 
       implementation:
         status: pending

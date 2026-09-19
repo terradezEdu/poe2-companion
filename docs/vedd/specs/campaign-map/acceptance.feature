@@ -1,4 +1,6 @@
 # language: en
+# Status: LOCKED — v0.1
+# Readiness: Contract locked — ready for Planning
 @campaign-map @v0_1
 Feature: Consult the Act 1 campaign map
   As a Path of Exile 2 player
@@ -18,6 +20,7 @@ Feature: Consult the Act 1 campaign map
       And no other Act is shown
       And no area is selected
       And the player is prompted in Spanish to select an area
+      And no area or boss information is presented as a selected preview
       And no control is available to change Acts or load different campaign information
 
   Rule: Connections describe direct traversal without recommending a route
@@ -157,6 +160,16 @@ Feature: Consult the Act 1 campaign map
         | unknown         | Jefe: Desconocido  | Recompensas: Desconocidas  |
         | verified absence | Jefe: Ninguno       | Recompensas: Ninguna       |
 
+    # Trace: examples.md Rule 8, Example 4
+    Scenario: Preserve unknown and verified-absent boss facts independently
+      Given "Jefe Alfa" has unknown weaknesses
+      And "Jefe Beta" has verified-absent weaknesses
+      When the player selects the area containing both bosses
+      Then the weaknesses of "Jefe Alfa" are shown as "Desconocidas"
+      And the weaknesses of "Jefe Beta" are shown as "Ningunas"
+      And both weakness fields remain visible
+      And neither boss knowledge state changes the other boss record or the area's usability
+
   Rule: Verification evidence belongs to the record it supports
 
     # Trace: examples.md Rule 9, Examples 1 and 3
@@ -186,6 +199,7 @@ Feature: Consult the Act 1 campaign map
       Then a global campaign information error is shown in Spanish
       And the Act 1 map is not shown
       And no partial campaign graph is shown
+      And no area preview is shown
 
       Examples:
         | structural problem                                   |
