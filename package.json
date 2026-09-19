@@ -7,13 +7,19 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2": "playwright test",
+    "test:acceptance": "playwright test tests/campaign-map.acceptance.spec.ts",
+    "test:smoke": "playwright test tests/harness.smoke.spec.ts",
+    "test:ui": "playwright test --ui",
+    "test:install:browsers": "playwright install chromium"
   },
   "dependencies": {
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
