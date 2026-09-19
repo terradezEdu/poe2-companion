@@ -380,3 +380,18 @@ The following distinctions are therefore mandatory:
 * structurally invalid data ≠ incomplete optional knowledge.
 * internal enum value ≠ localized UI label.
 * verified record ≠ every optional property known.
+
+## Decision — Verification without accepted sources
+
+A record declaring VERIFIED without at least one accepted source
+must not remain VERIFIED.
+
+This condition is not a structural dataset error.
+
+The record verification status is normalized to UNKNOWN and the
+dataset remains usable.
+
+The UI therefore presents "Sin verificar" for that record.
+
+This normalization does not alter the knowledge state of the record's
+optional fields.
