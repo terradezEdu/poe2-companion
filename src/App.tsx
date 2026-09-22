@@ -1,11 +1,28 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
 
+const CampaignMapSurfaceTestAdapter =
+  import.meta.env.VITE_CAMPAIGN_TEST_MODE === '1'
+    ? lazy(() => import('./test-support/campaign-map-surface.tsx'))
+    : null
+
 function App() {
   const [count, setCount] = useState(0)
+
+  const isMapSurfaceTest =
+    import.meta.env.VITE_CAMPAIGN_TEST_MODE === '1' &&
+    new URLSearchParams(window.location.search).get('__campaignMapSurface') === '1'
+
+  if (isMapSurfaceTest && CampaignMapSurfaceTestAdapter) {
+    return (
+      <Suspense fallback={null}>
+        <CampaignMapSurfaceTestAdapter />
+      </Suspense>
+    )
+  }
 
   return (
     <>

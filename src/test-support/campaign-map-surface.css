@@ -1,0 +1,16 @@
+.campaign-map-test-surface {
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+  text-align: left;
+}
+
+.campaign-map-test-surface h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.campaign-map-test-surface output {
+  color: var(--text-h);
+  font: 0.85rem/1.2 var(--mono);
+}
