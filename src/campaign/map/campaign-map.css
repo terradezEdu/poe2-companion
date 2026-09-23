@@ -37,6 +37,7 @@
 }
 
 .campaign-map__edge {
+  fill: none;
   stroke: #88a4a1;
   stroke-width: 3;
   opacity: 0.92;

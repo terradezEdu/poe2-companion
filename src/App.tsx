@@ -12,14 +12,15 @@ const CampaignMapSurfaceTestAdapter =
 function App() {
   const [count, setCount] = useState(0)
 
+  const campaignFixture = new URLSearchParams(window.location.search).get('__campaignFixture')
   const isMapSurfaceTest =
     import.meta.env.VITE_CAMPAIGN_TEST_MODE === '1' &&
-    new URLSearchParams(window.location.search).get('__campaignMapSurface') === '1'
+    (campaignFixture === 'map-interaction' || campaignFixture === 'map-layout-crossing')
 
   if (isMapSurfaceTest && CampaignMapSurfaceTestAdapter) {
     return (
       <Suspense fallback={null}>
-        <CampaignMapSurfaceTestAdapter />
+        <CampaignMapSurfaceTestAdapter fixture={campaignFixture!} />
       </Suspense>
     )
   }

@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react'
 import { localizeKnowledge } from '../localization/index.ts'
 import type { AreaKnowledge, CampaignConnection } from '../domain/index.ts'
-import { connectionDirectionLabel, createCampaignGraphLayout, graphLinePoints } from './layout.ts'
+import { connectionDirectionLabel, createCampaignGraphLayout, graphEdgePath, type GraphNodeSize } from './layout.ts'
 import './campaign-map.css'
 
 export interface CampaignMapProps {
@@ -34,10 +34,36 @@ const MAX_SCALE = 1.85
 
 export function CampaignMap({ areas, connections, selectedAreaId, onAreaSelect }: CampaignMapProps) {
   const viewportRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<DragState | null>(null)
   const [transform, setTransform] = useState<ViewTransform>(INITIAL_TRANSFORM)
-  const layout = useMemo(() => createCampaignGraphLayout(areas, connections), [areas, connections])
+  const [nodeSizes, setNodeSizes] = useState<ReadonlyMap<string, GraphNodeSize>>(() => new Map())
+  const layout = useMemo(() => createCampaignGraphLayout(areas, connections, nodeSizes), [areas, connections, nodeSizes])
   const areasById = useMemo(() => new Map(areas.map((area) => [area.id, area])), [areas])
+  const nodesMeasured = areas.every((area) => nodeSizes.has(area.id))
+
+  useLayoutEffect(() => {
+    const buttons = canvasRef.current?.querySelectorAll<HTMLButtonElement>('[data-campaign-area]')
+    if (!buttons) return
+    const measure = () => {
+      const sizes = new Map<string, GraphNodeSize>()
+      for (const button of buttons) {
+        const areaId = button.dataset.areaId
+        if (areaId) sizes.set(areaId, { width: button.offsetWidth, height: button.offsetHeight })
+      }
+      setNodeSizes((previous) => {
+        if (previous.size === sizes.size && [...sizes].every(([id, size]) => {
+          const old = previous.get(id)
+          return old?.width === size.width && old.height === size.height
+        })) return previous
+        return sizes
+      })
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    buttons.forEach((button) => observer.observe(button))
+    return () => observer.disconnect()
+  }, [areas])
 
   function beginPan(event: PointerEvent<HTMLDivElement>) {
     if (event.button !== 0) return
@@ -101,6 +127,7 @@ export function CampaignMap({ areas, connections, selectedAreaId, onAreaSelect }
         onWheel={zoom}
       >
         <div
+          ref={canvasRef}
           className="campaign-map__canvas"
           style={{
             width: layout.width,
@@ -108,7 +135,7 @@ export function CampaignMap({ areas, connections, selectedAreaId, onAreaSelect }
             transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
           }}
         >
-          <svg className="campaign-map__edges" width={layout.width} height={layout.height} aria-hidden="true">
+          <svg className="campaign-map__edges" width={layout.width} height={layout.height} aria-hidden="true" style={{ visibility: nodesMeasured ? 'visible' : 'hidden' }}>
             <defs>
               <marker id="campaign-map-arrow-directed" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
                 <path d="M0,0 L0,6 L6,3 z" fill="#d4ac60" />
@@ -121,14 +148,13 @@ export function CampaignMap({ areas, connections, selectedAreaId, onAreaSelect }
               </marker>
             </defs>
             {layout.edges.map((edge) => {
-              const points = graphLinePoints(edge)
               return (
-                <line
+                <path
                   key={`${edge.fromAreaId}-${edge.toAreaId}`}
                   className={`campaign-map__edge campaign-map__edge--${edge.direction.toLowerCase()}`}
                   data-testid={`campaign-connection-${edge.fromAreaId}-${edge.toAreaId}`}
                   data-direction={connectionDirectionLabel(edge)}
-                  {...points}
+                  d={graphEdgePath(edge)}
                   markerEnd={`url(#campaign-map-arrow-${edge.direction === 'BIDIRECTIONAL' ? 'both-end' : 'directed'})`}
                   markerStart={edge.direction === 'BIDIRECTIONAL' ? 'url(#campaign-map-arrow-both-start)' : undefined}
                 />

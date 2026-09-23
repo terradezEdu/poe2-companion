@@ -7,6 +7,8 @@
  * explicit test-mode flag is enabled by the Playwright web server.
  */
 export const campaignFixtures = {
+  mapInteraction: 'map-interaction',
+  mapLayoutCrossing: 'map-layout-crossing',
   connectionBidirectional: 'connection-bidirectional',
   connectionDirected: 'connection-directed',
   branch: 'branch',
