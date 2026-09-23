@@ -2,11 +2,12 @@
  * Browser-test fixture IDs for the locked campaign-map acceptance contract.
  *
  * These are test inputs, not production data and not a runtime dataset
- * selection capability. The normal browser path must continue to use the
- * bundled campaign data. A future test adapter may accept an ID only when its
- * explicit test-mode flag is enabled by the Playwright web server.
+ * selection capability. The normal browser path uses the bundled campaign
+ * data; the test adapter accepts an ID only when its explicit test-mode flag
+ * is enabled by the Playwright web server.
  */
 export const campaignFixtures = {
+  applicationDefault: 'application-default',
   mapInteraction: 'map-interaction',
   mapLayoutCrossing: 'map-layout-crossing',
   connectionBidirectional: 'connection-bidirectional',

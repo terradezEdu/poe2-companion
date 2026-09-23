@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test'
-import { fixtureUrl, type CampaignFixture } from '../../src/test-support/campaign-fixtures'
+import { campaignFixtures, fixtureUrl, type CampaignFixture } from '../../src/test-support/campaign-fixtures'
 
 /**
  * Observable selectors for the campaign-map contract.
@@ -34,11 +34,23 @@ export function bossRecord(page: Page, name: string) {
 }
 
 export function recordField(record: Locator, name: string) {
-  return record.getByTestId(`record-field-${name}`)
+  return record.getByTestId(`record-field-${name}`).locator('dd')
+}
+
+/** SVG paths with a straight horizontal/vertical segment may have a zero-size
+ * dimension, which makes Playwright's generic toBeVisible report them hidden. */
+export async function expectVisibleConnection(connection: Locator) {
+  await expect(connection).toHaveAttribute('d', /\S/)
+  await expect.poll(() => connection.evaluate((path) => {
+    const rect = path.getBoundingClientRect()
+    const style = getComputedStyle(path)
+    return style.visibility !== 'hidden' && style.stroke !== 'none' &&
+      Number.parseFloat(style.strokeWidth) > 0 && (rect.width > 0 || rect.height > 0)
+  })).toBe(true)
 }
 
 export async function openCampaignMap(page: Page, fixture?: CampaignFixture) {
-  await page.goto(fixture ? fixtureUrl(fixture) : '/')
+  await page.goto(fixtureUrl(fixture ?? campaignFixtures.applicationDefault))
 }
 
 export async function selectArea(page: Page, name: string) {
