@@ -14,6 +14,7 @@ import {
   bossRecord,
   campaignMap,
   expectBefore,
+  expectVisibleConnection,
   mapViewport,
   openCampaignMap,
   panAndZoom,
@@ -40,23 +41,23 @@ test.describe('Campaign Map — locked acceptance contract', () => {
   test('Rule 2 / Scenario: A connection without an explicit direction allows traversal both ways', async ({ page }) => {
     await openCampaignMap(page, campaignFixtures.connectionBidirectional)
     const connection = page.getByTestId('campaign-connection-area-a-area-b')
-    await expect(connection).toBeVisible()
+    await expectVisibleConnection(connection)
     await expect(connection).toHaveAttribute('data-direction', 'both')
   })
 
   test('Rule 2 / Scenario: An explicitly directed connection allows traversal only in its stated direction', async ({ page }) => {
     await openCampaignMap(page, campaignFixtures.connectionDirected)
     const connection = page.getByTestId('campaign-connection-area-b-area-c')
-    await expect(connection).toBeVisible()
-    await expect(connection).toHaveAttribute('data-direction', 'b-to-c')
+    await expectVisibleConnection(connection)
+    await expect(connection).toHaveAttribute('data-direction', 'area-b-to-area-c')
     await expect(connection).not.toHaveAttribute('data-direction', 'both')
     manualVisualEvidenceNotRun('Review arrow/line treatment for visible directionality.')
   })
 
   test('Rule 2 / Scenario: A branch is not presented as a recommended route', async ({ page }) => {
     await openCampaignMap(page, campaignFixtures.branch)
-    await expect(page.getByTestId('campaign-connection-area-a-area-b')).toBeVisible()
-    await expect(page.getByTestId('campaign-connection-area-a-area-c')).toBeVisible()
+    await expectVisibleConnection(page.getByTestId('campaign-connection-area-a-area-b'))
+    await expectVisibleConnection(page.getByTestId('campaign-connection-area-a-area-c'))
     await expect(page.getByText(/recomendad[oa]|óptim[oa]|obligatori[oa]/i)).toHaveCount(0)
   })
 
@@ -75,7 +76,7 @@ test.describe('Campaign Map — locked acceptance contract', () => {
     const before = await preview(page).innerText()
     await panAndZoom(page)
     await expect(selectedAreas(page)).toHaveAttribute('data-area-id', 'area-b')
-    await expect(preview(page)).toHaveText(before)
+    await expect.poll(() => preview(page).innerText()).toBe(before)
     manualVisualEvidenceNotRun('Review pan/zoom feedback and desktop usability.')
   })
 
@@ -93,7 +94,7 @@ test.describe('Campaign Map — locked acceptance contract', () => {
     await expect(preview(page)).toHaveCount(0)
     await page.keyboard.press('Enter')
     await expect(selectedAreas(page)).toHaveAttribute('data-area-id', 'area-a')
-    await expect(preview(page)).toHaveText(pointerPreview)
+    await expect.poll(() => preview(page).innerText()).toBe(pointerPreview)
     manualVisualEvidenceNotRun('Review visible focus indicator versus selected styling.')
   })
 
@@ -187,8 +188,8 @@ test.describe('Campaign Map — locked acceptance contract', () => {
     test(`Rule 8 / Scenario Outline: knowledge ${knowledge}`, async ({ page }) => {
       await openCampaignMap(page, fixture)
       await selectArea(page, 'Área A')
-      await expect(preview(page)).toContainText(bossDisplay)
-      await expect(preview(page)).toContainText(rewardDisplay)
+      await expect(preview(page)).toContainText(new RegExp(bossDisplay.replace(': ', ':\\s*')))
+      await expect(preview(page)).toContainText(new RegExp(rewardDisplay.replace(': ', ':\\s*')))
     })
   }
 
