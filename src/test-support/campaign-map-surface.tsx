@@ -19,6 +19,7 @@ const crossingAreas = 'abcdefghi'.split('').map((letter) =>
 )
 const crossingConnections: readonly CampaignConnection[] = [
   { fromAreaId: 'area-a', toAreaId: 'area-b', direction: 'BIDIRECTIONAL' },
+  { fromAreaId: 'area-b', toAreaId: 'area-c', direction: 'DIRECTED' },
   { fromAreaId: 'area-a', toAreaId: 'area-i', direction: 'DIRECTED' },
 ]
 const interactionDataset = validateFixture(interactionAreas, interactionConnections)

@@ -66,6 +66,39 @@ test.describe('Campaign Map surface — Issue #7 task gate', () => {
     }
   })
 
+  test('keeps the A-to-I transition distinct from local connections near B and C', async ({ page }) => {
+    await openSurface(page, campaignFixtures.mapLayoutCrossing)
+    await expect(page.getByTestId('campaign-connection-area-a-area-i')).toBeVisible()
+    const geometry = await page.locator('.campaign-map__edges').evaluate((svg) => {
+      const sample = (id: string) => {
+        const path = svg.querySelector<SVGPathElement>(`[data-testid="campaign-connection-${id}"]`)!
+        const points: Array<{ x: number; y: number }> = []
+        for (let distance = 0; distance <= path.getTotalLength(); distance += 2) {
+          const point = path.getPointAtLength(distance)
+          points.push({ x: point.x, y: point.y })
+        }
+        return { points, start: points[0] }
+      }
+      const long = sample('area-a-area-i')
+      const ab = sample('area-a-area-b')
+      const bc = sample('area-b-area-c')
+      const clearance = (local: typeof long) => Math.min(...long.points.flatMap((point) =>
+        local.points.map((other) => Math.hypot(point.x - other.x, point.y - other.y)),
+      ))
+      return {
+        longStart: long.start,
+        abStart: ab.start,
+        distanceFromAb: clearance(ab),
+        distanceFromBc: clearance(bc),
+      }
+    })
+    expect(geometry.longStart.x).toBeLessThan(geometry.abStart.x)
+    expect(geometry.longStart.y).toBeGreaterThan(geometry.abStart.y)
+    expect(geometry.distanceFromAb).toBeGreaterThan(24)
+    expect(geometry.distanceFromBc).toBeGreaterThan(24)
+    await page.screenshot({ path: '/tmp/campaign-map-issue-7-near-node.png', fullPage: true })
+  })
+
   test('pointer selection emits exactly one stable identifier and survives pan and zoom', async ({ page }) => {
     await openSurface(page)
     await area(page, 'Área A').click()

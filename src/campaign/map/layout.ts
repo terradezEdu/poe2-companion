@@ -51,7 +51,9 @@ const MAP_PADDING_Y = 125
 const MIN_COLUMNS = 2
 const NODE_HALF_WIDTH = 90
 const NODE_HALF_HEIGHT = 25
-const EDGE_CLEARANCE = 12
+// A line passing just outside a node can look like it joins that node's edge.
+// Keep unrelated routes outside the node's immediate connection neighborhood.
+const EDGE_CLEARANCE = 36
 const DEFAULT_NODE_SIZE: GraphNodeSize = { width: NODE_HALF_WIDTH * 2, height: NODE_HALF_HEIGHT * 2 }
 
 export function createCampaignGraphLayout(
@@ -106,8 +108,9 @@ export function createCampaignGraphLayout(
 
 /**
  * Routes a connection through a deterministic rectilinear visibility grid.
- * Other node bodies plus a small clearance are obstacles, so every emitted
- * segment remains visually separate from unrelated areas.
+ * Unrelated node neighborhoods are obstacles. Diagonal connections initially
+ * leave vertically, keeping them distinct from the short horizontal links
+ * between adjacent nodes in the same row.
  */
 function routeAroundNodes(
   from: CampaignGraphNode,
@@ -163,6 +166,7 @@ function routeAroundNodes(
       [current.column, current.row + 1],
     ]) {
       if (column < 0 || column >= xs.length || row < 0 || row >= ys.length) continue
+      if (current.key === startKey && from.x !== to.x && from.y !== to.y && row === current.row) continue
       const nextKey = key(column, row)
       if (visited.has(nextKey)) continue
       const a = { x: xs[current.column], y: ys[current.row] }
