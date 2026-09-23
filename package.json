@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test:e2": "playwright test",
-    "test:unit": "tsx --test tests/unit/*.test.ts",
+    "test:unit": "node --import tsx --test tests/unit/*.test.ts",
     "test:acceptance": "playwright test tests/campaign-map.acceptance.spec.ts",
     "test:smoke": "playwright test tests/harness.smoke.spec.ts",
     "test:ui": "playwright test --ui",

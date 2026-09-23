@@ -236,7 +236,7 @@ function RecordField({ field, label, children }: { readonly field: string; reado
   return React.createElement(
     'div',
     { className: 'preview-field', 'data-testid': `record-field-${field}` },
-    React.createElement('dt', null, label),
+    React.createElement('dt', null, `${label}:`),
     React.createElement('dd', null, children),
   )
 }

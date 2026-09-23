@@ -42,6 +42,16 @@ function previewFor(overrides: Record<string, unknown> = {}) {
   return result.dataset.act.areas[0]
 }
 
+function fieldText(html: string, field: string) {
+  const fieldMarkup = html.match(new RegExp(`<div class="preview-field" data-testid="record-field-${field}">([\\s\\S]*?)<\\/div>`))?.[1]
+  assert.ok(fieldMarkup, `Expected the ${field} field to be rendered.`)
+  const label = fieldMarkup.match(/<dt>([\s\S]*?)<\/dt>/)?.[1]
+  const value = fieldMarkup.match(/<dd>([\s\S]*?)<\/dd>/)?.[1]
+  assert.ok(label, `Expected the ${field} field to have a label.`)
+  assert.ok(value, `Expected the ${field} field to have a value.`)
+  return `${label.replace(/<[^>]*>/g, '')} ${value.replace(/<[^>]*>/g, '')}`
+}
+
 test('renders the Spanish default prompt without a selected-area record', () => {
   const html = renderToStaticMarkup(createElement(SelectedAreaPreview))
 
@@ -104,7 +114,21 @@ test('renders unknown and verified-absent optional knowledge explicitly', () => 
 
   assert.match(html, /Peligro del área[\s\S]*Desconocido/)
   assert.match(html, /Advertencia Hardcore[\s\S]*Desconocida/)
-  assert.match(html, /Recompensas[\s\S]*Ninguna/)
-  assert.match(html, /Jefe[\s\S]*Desconocido/)
+  assert.equal(fieldText(html, 'rewards'), 'Recompensas: Ninguna')
+  assert.equal(fieldText(html, 'bosses'), 'Jefe: Desconocido')
   assert.doesNotMatch(html, /Peligro del área[\s\S]*Bajo/)
+})
+
+test('renders the exact locked labels for unknown and verified-absent rewards and bosses', () => {
+  const unknownHtml = renderToStaticMarkup(createElement(SelectedAreaPreview, {
+    area: previewFor({ rewards: { state: 'unknown' }, bosses: { state: 'unknown' } }),
+  }))
+  const absentHtml = renderToStaticMarkup(createElement(SelectedAreaPreview, {
+    area: previewFor({ rewards: { state: 'verified-absent' }, bosses: { state: 'verified-absent' } }),
+  }))
+
+  assert.equal(fieldText(unknownHtml, 'rewards'), 'Recompensas: Desconocidas')
+  assert.equal(fieldText(unknownHtml, 'bosses'), 'Jefe: Desconocido')
+  assert.equal(fieldText(absentHtml, 'rewards'), 'Recompensas: Ninguna')
+  assert.equal(fieldText(absentHtml, 'bosses'), 'Jefe: Ninguno')
 })
