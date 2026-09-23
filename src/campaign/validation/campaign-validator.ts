@@ -155,7 +155,9 @@ function normaliseBoss(raw: RawRecord, index: number): BossKnowledge {
 
 function asBossArray(value: unknown): readonly BossKnowledge[] | undefined {
   const records = asArray(value)
-  if (!records || !records.every(isRecord)) return undefined
+  // An empty raw collection carries no established boss records. Treat it as
+  // insufficient knowledge at the boundary; verified absence must be explicit.
+  if (!records || records.length === 0 || !records.every(isRecord)) return undefined
   return records.map(normaliseBoss)
 }
 

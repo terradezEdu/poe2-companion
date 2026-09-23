@@ -103,6 +103,26 @@ test('preserves known, unknown, and verified-absent facts independently', () => 
   if (area.bosses.state === 'known') assert.equal(area.bosses.value[0].weaknesses.state, 'unknown')
 })
 
+test('does not admit an empty raw boss collection as known empty knowledge', () => {
+  const input = validDataset()
+  input.acts[0].areas[0].bosses = []
+  input.acts[0].areas[1].bosses = { state: 'known', value: [] }
+  const result = validateCampaignDataset(input)
+
+  assert.equal(result.ok, true)
+  if (!result.ok) return
+  const [areaA, areaB] = result.dataset.act.areas
+  assert.equal(areaA.bosses.state, 'unknown')
+  assert.equal(areaB.bosses.state, 'unknown')
+
+  const explicitAbsence = validDataset()
+  explicitAbsence.acts[0].areas[0].bosses = { state: 'verified-absent' }
+  const absentResult = validateCampaignDataset(explicitAbsence)
+  assert.equal(absentResult.ok, true)
+  if (!absentResult.ok) return
+  assert.equal(absentResult.dataset.act.areas[0].bosses.state, 'verified-absent')
+})
+
 test('keeps connection direction and verification evidence record-scoped', () => {
   const input = validDataset()
   input.connections[0].direction = 'DIRECTED'
