@@ -21,6 +21,9 @@ Contract locked — ready for Planning.
   pixel-perfect reproduction of Grinding Gear Games UI or assets.
 - No exact official screenshot, composition, or asset is mandatory for v0.1.
   Visual design remains flexible within the stable rules below.
+- The Human Contract Decision of 2026-09-24 authorizes a scoped post-lock
+  grammatical correction for the displayed `Debilidades` field only. All
+  other locked v0.1 visual behavior remains unchanged.
 
 ---
 
@@ -87,6 +90,8 @@ unambiguous.
   `Desconocido`.
 - Verified absence is visible as the grammatically appropriate form of
   `Ninguno`.
+- The displayed field label `Debilidades` uses `Desconocidas` for unknown
+  knowledge and `Ningunas` for verified absence.
 - Empty space, an omitted value, and `Ninguno` cannot be used to mean
   `Desconocido`.
 - `Desconocido` danger cannot look equivalent to `Bajo`.

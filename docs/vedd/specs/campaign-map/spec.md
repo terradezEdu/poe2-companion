@@ -25,6 +25,10 @@ The seven blocking ambiguities from the latest Challenger review are resolved in
 this specification. Deferred requirements remain outside v0.1 and do not block
 Example Mapping.
 
+The Human Contract Decision of 2026-09-24 authorizes a scoped post-lock
+grammatical correction for the displayed `Debilidades` field only. All other
+locked v0.1 behavior remains unchanged.
+
 ---
 
 # 1. Purpose
@@ -155,6 +159,8 @@ in English, but the UI MUST use these mappings:
   plural form required by its Spanish field label.
 - Verified absence uses `Ninguno`, `Ninguna`, or the corresponding plural
   form required by its Spanish field label.
+- For the displayed field label `Debilidades`, unknown knowledge is
+  `Desconocidas` and verified absence is `Ningunas`.
 - Canonical internal values are not displayed as untranslated UI labels.
 
 ---

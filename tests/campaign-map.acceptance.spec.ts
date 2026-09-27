@@ -196,9 +196,10 @@ test.describe('Campaign Map — locked acceptance contract', () => {
   test('Rule 8 / Scenario: Preserve unknown and verified-absent boss facts independently', async ({ page }) => {
     await openCampaignMap(page, campaignFixtures.bossKnowledgeIndependent)
     await selectArea(page, 'Área A')
-    const details = preview(page)
-    await expect(details.getByRole('article', { name: /Jefe Alfa/i })).toContainText('Desconocidas')
-    await expect(details.getByRole('article', { name: /Jefe Beta/i })).toContainText('Ningunas')
+    const alfa = bossRecord(page, 'Jefe Alfa')
+    const beta = bossRecord(page, 'Jefe Beta')
+    await expect(recordField(alfa, 'weaknesses')).toHaveText('Desconocidas')
+    await expect(recordField(beta, 'weaknesses')).toHaveText('Ningunas')
   })
 
   test('Rule 9 / Scenario: Keep area and boss verification evidence independent', async ({ page }) => {
@@ -230,14 +231,34 @@ test.describe('Campaign Map — locked acceptance contract', () => {
     await selectArea(page, 'Área A')
     const boss = bossRecord(page, 'Jefe Alfa')
     await expect(boss).toContainText('Verificado')
-    await expect(boss).toContainText('Desconocida')
+    await expect(recordField(boss, 'weaknesses')).toHaveText('Desconocidas')
+  })
+
+  test('Rule 9 / Scenario: Normalize source-less verification without changing optional knowledge', async ({ page }) => {
+    await openCampaignMap(page, campaignFixtures.sourceLessVerifiedBoss)
+    await selectArea(page, 'Área A')
+    const boss = bossRecord(page, 'Jefe Alfa')
+    const verification = recordField(boss, 'verification')
+
+    await expect(verification).toHaveText('Sin verificar')
+    await expect(verification).not.toHaveText('Verificado')
+    await expect(recordField(boss, 'weaknesses')).toHaveText('Desconocidas')
+    await expect(recordField(boss, 'rewards')).toHaveText('Ninguna')
+    await expect(campaignMap(page)).toBeVisible()
+    await expect(page.getByRole('alert')).toHaveCount(0)
   })
 
   for (const [value, fixture, label] of controlledValueFixtures) {
     test(`Rule 10 / Scenario Outline: localizes ${value}`, async ({ page }) => {
       await openCampaignMap(page, fixture)
       await selectArea(page, 'Área A')
-      await expect(preview(page)).toContainText(label)
+      if (value === 'verification VERIFIED' || value === 'verification UNKNOWN') {
+        await expect(recordField(areaRecord(page), 'verification')).toHaveText(label)
+      } else if (value === 'verified-absent feminine singular knowledge') {
+        await expect(recordField(areaRecord(page), 'rewards')).toHaveText('Ninguna')
+      } else {
+        await expect(preview(page)).toContainText(label)
+      }
       await expect(preview(page)).not.toContainText(/LOW|MEDIUM|HIGH|EXTREME|UNKNOWN|VERIFIED/)
     })
   }

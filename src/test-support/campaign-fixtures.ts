@@ -23,6 +23,7 @@ export const campaignFixtures = {
   bossKnowledgeIndependent: 'boss-knowledge-independent',
   areaBossVerificationIndependent: 'area-boss-verification-independent',
   verifiedBossUnknownWeakness: 'verified-boss-unknown-weakness',
+  sourceLessVerifiedBoss: 'source-less-verified-boss',
   optionalKnowledgeMissing: 'optional-knowledge-missing',
   versionKnown: 'version-known',
   versionUnknown: 'version-unknown',

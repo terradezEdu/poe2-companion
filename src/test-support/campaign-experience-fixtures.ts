@@ -91,6 +91,12 @@ export function campaignExperienceFixture(fixture: string): unknown {
       area.bosses = known([alfa]); break
     case campaignFixtures.verifiedBossUnknownWeakness:
       alfa.weaknesses = unknown(); area.bosses = known([alfa]); break
+    case campaignFixtures.sourceLessVerifiedBoss:
+      alfa.verification = { status: 'VERIFIED', sources: [], verifiedAt: '2025-01-01' }
+      alfa.weaknesses = unknown()
+      alfa.rewards = absent()
+      area.bosses = known([alfa])
+      break
     case campaignFixtures.optionalKnowledgeMissing:
       alfa.description = unknown(); alfa.weaknesses = unknown(); area.bosses = known([alfa]); break
     case campaignFixtures.verificationUnknown:

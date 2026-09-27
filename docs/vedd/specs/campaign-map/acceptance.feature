@@ -188,7 +188,7 @@ Feature: Consult the Act 1 campaign map
       And the weakness of "Jefe Alfa" is unknown
       When the player opens the boss information
       Then "Jefe Alfa" is shown as "Verificado"
-      And its weakness is shown as "Desconocida"
+      And its weakness is shown as "Desconocidas"
 
     # Trace: examples.md Rule 9, Example 4
     Scenario: Normalize source-less verification without changing optional knowledge
@@ -198,7 +198,7 @@ Feature: Consult the Act 1 campaign map
       When the player selects the area containing "Jefe Alfa"
       Then "Jefe Alfa" is shown as "Sin verificar"
       And "Jefe Alfa" is not shown as "Verificado"
-      And its weakness is shown as "Desconocida"
+      And its weakness is shown as "Desconocidas"
       And its rewards are shown as "Ninguna"
       And the Act 1 map remains available
       And no global campaign information error is shown

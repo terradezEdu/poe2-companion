@@ -263,7 +263,7 @@ value is `UNKNOWN`.
 **Expected outcome:**
 
 - Jefe Alfa displays `Verificado`;
-- its weakness displays `Desconocida`;
+- its weakness displays `Desconocidas`;
 - the unknown weakness does not change the boss record to `Sin verificar`;
 - the boss source remains associated with Jefe Alfa.
 
@@ -288,7 +288,7 @@ boss record; neither is visually attributed to the other record.
   `Sin verificar`;
 - the campaign map remains usable and Jefe Alfa remains available in its own
   boss block without a global dataset error;
-- the weakness remains unknown and displays `Desconocida`; and
+- the weakness remains unknown and displays `Desconocidas`; and
 - the verified-absent rewards remain verified absent and display `Ninguna`.
 
 ---
