@@ -364,8 +364,6 @@ The verification/status assertions were rechecked for the same record-crossing c
 - Locked Spec, Visual Spec, Examples, and Acceptance Contract changes in this correction: **NONE**.
 - No scenario or assertion was removed or weakened; the executable count remains **39**.
 
----
-
 ## Issue #4 — Final Rule 10 rewards-field evidence correction
 
 **Date:** 2026-09-27
@@ -409,3 +407,98 @@ The other Rule 10 field-specific rows remain internally consistent: verification
 - Production implementation changes in this correction: **NONE**.
 - Locked Spec, Visual Spec, Examples, and Acceptance Contract changes in this correction: **NONE**.
 - No scenario or assertion was removed or weakened; the executable count remains **39**.
+
+---
+
+## Campaign Map v0.2 — Act 1 boss-enrichment hardening
+
+**Date:** 2026-09-28
+**Role:** Hardener
+**Evidence level:** E2
+**Classification:** data-quality hardening plus one source-determined data correction; no contract or schema amendment.
+
+### Enrichment scope and independent audit
+
+- Audited all **15** bundled Act 1 boss records and all **90** enrichment-field states across description, damage types, weaknesses, resistances, dangerous mechanics, and rewards.
+- Confirmed one matching source-audit entry per production boss and verified that every `SUPPORTED_FACT` value survives campaign validation unchanged.
+- Confirmed all `UNSUPPORTED`, `REJECTED_BY_HUMAN_DATA_DECISION`, and `SOURCE_CONFLICT` audit states remain production `UNKNOWN`; none became `VERIFIED-ABSENT`.
+- Confirmed the Human Data Decisions remain applied: weaknesses require an explicit source declaration; skill-level damage is not aggregated into boss-level damage; factual encounter summaries are permitted without inferred tactics or severity; and only causally boss-bound encounter or quest outcomes are represented as boss rewards.
+- Confirmed Lachlann's damage remains `UNKNOWN`, Count Geonor's disputed location is omitted, and the Executioner/King in the Mists/Count Geonor resistance disputes preserve only the agreed categorical type without a percentage.
+
+### Data defect corrected
+
+The Rust King's curated resistances previously contained `Físico` and `Fuego`. The accepted PoE2DB boss record explicitly establishes Fire resistance and separately reports armour; the accepted PoE2 Wiki boss record does not declare Physical resistance. Treating armour as Physical resistance would be an unsupported semantic inference. Production data and its audit entry were therefore narrowed to the source-established categorical value `Fuego`; the explicit Lightning weakness remains unchanged.
+
+### Stale source-count assertion correction
+
+The previous production-data assertion required exactly one source per boss. It now verifies the actual record-scoped traceability invariant:
+
+- every verified boss has one to four sources;
+- every source is non-empty, whitespace-clean, URL-parseable, and belongs to the accepted PoE2DB or PoE2 Wiki source families and record types;
+- exact source URL sets are asserted per boss, so a valid-family source belonging to another record is rejected;
+- duplicate source entries are rejected;
+- every field-audit source is represented by that boss record's production provenance, allowing the PoE2DB locale difference while preserving the source record identity;
+- boss verification dates remain independently `2026-09-28`, while area dates remain `2026-09-22`.
+
+This replaces a cardinality assumption with stronger provenance, family, formatting, ownership, uniqueness, and date checks. Multiple accepted sources are allowed without weakening traceability.
+
+### Persistent regression evidence added
+
+- Dataset ↔ audit consistency covers all 15 bosses and all 90 field states.
+- Knowledge-state fidelity covers unsupported facts, rejected weakness inference, rejected skill-damage aggregation, and source conflicts.
+- Supported-fact evidence covers explicit weaknesses, Human-Decision-approved dangerous mechanics, causally boss-bound rewards, and categorical resistance preservation.
+- Focused assertions preserve the 29 unresolved `UNKNOWN` fields and the five documented source conflicts.
+- Production browser integration now selects Beira, Lachlann, the Executioner, and Ogham Manor from the bundled dataset and checks exact record-field output for known combat facts, explicit weakness, dangerous mechanics, boss reward, unknown damage/weakness, categorical resistance without percentages, record-scoped sources, and the independent boss verification date.
+
+### Product-visible inspection
+
+Full-page Chromium captures were inspected for Beira and Ogham Manor/Count Geonor after the focused integration test. Long mechanics, rewards, and multi-source provenance wrap without clipping or horizontal overflow. No implementation defect was found. The existing tall desktop preview composition was not redesigned; separate visual-fidelity work remains explicitly deferred.
+
+### Remaining unknown knowledge
+
+There are **29** boss enrichment fields that remain honestly `UNKNOWN`:
+
+- Bloated Miller: weaknesses, resistances.
+- Devourer: weaknesses.
+- Brambleghast: rewards.
+- Rust King: dangerous mechanics.
+- Rotten Druid (Grim Tangle): damage types, weaknesses, resistances, dangerous mechanics, rewards.
+- Lachlann: damage types, weaknesses.
+- Draven: damage types, weaknesses.
+- Asinia: damage types, weaknesses, dangerous mechanics.
+- Rotten Druid (Root Hollow): damage types, weaknesses, resistances, dangerous mechanics, rewards.
+- Crowbell: weaknesses, resistances.
+- King in the Mists: weaknesses, dangerous mechanics.
+- Executioner: weaknesses.
+- Candlemass: weaknesses.
+- Count Geonor: weaknesses.
+
+### Remaining source conflicts
+
+- Lachlann boss-level damage types.
+- Executioner Fire-resistance magnitude.
+- King in the Mists Chaos-resistance magnitude.
+- Count Geonor Cold-resistance magnitude.
+- Count Geonor campaign location name.
+
+### Complete hardening evidence
+
+| Type | Command | Result |
+|---|---|---|
+| unit | `npm run test:unit` | pass — 4 test files passed, 0 failed |
+| static | `npm run lint` | pass — `oxlint` completed successfully |
+| build | `npm run build` | pass — TypeScript build and Vite production bundle completed successfully |
+| smoke | `npm run test:smoke` | pass — 1 Chromium test passed, 0 failed |
+| acceptance | `npm run test:acceptance` | pass — 39 Chromium tests passed, 0 failed |
+| browser / E2 | `npx playwright test tests/harness.smoke.spec.ts tests/campaign-map-integration.spec.ts tests/campaign-map-surface.spec.ts tests/campaign-map.acceptance.spec.ts tests/visual/campaign-preview.visual.spec.ts` | pass — 56 Chromium tests passed, 0 failed |
+| production-data validation | `node --import tsx tests/unit/campaign-production-data.test.ts` | pass — 7 tests passed, 0 failed |
+| static | `git diff --check` | pass — no whitespace errors |
+
+`npm run test:e2` also returned exit code 0 with 56 Playwright tests passing. Its broad default discovery additionally imported `tests/unit/*.test.ts`, which emitted five Node-test preview failures outside Playwright's accounting. The explicit browser-spec command above was therefore run separately and is the clean browser/E2 result of record. A preliminary parallel smoke/Acceptance launch also failed before test execution because two Vite web-server lifecycles were started concurrently; both required suites subsequently passed in isolated sequential runs.
+
+### Scope and contract impact
+
+- Production application logic changes: **NONE**.
+- Production data correction: Rust King resistances only, as described above.
+- Locked Spec, Visual Spec, Examples, Acceptance Contract, Product Decisions, schema, and validation logic changes: **NONE**.
+- Deferred work: visual-fidelity redesign remains out of scope.
