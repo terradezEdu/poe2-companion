@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { campaignFixtures, fixtureUrl } from '../src/test-support/campaign-fixtures.ts'
-import { area, campaignMap, mapViewport, preview, selectedAreas } from './support/campaign-map.ts'
+import { area, bossRecord, campaignMap, mapViewport, preview, recordField, selectedAreas } from './support/campaign-map.ts'
 
 test('bundled Act 1 validates and connects map selection to its own preview', async ({ page }) => {
   await page.goto('/')
@@ -26,6 +26,43 @@ test('bundled Act 1 validates and connects map selection to its own preview', as
   await mapViewport(page).hover({ position: { x: 400, y: 400 } })
   await page.mouse.wheel(0, -300)
   await expect.poll(() => preview(page).innerText()).toBe(before)
+})
+
+test('bundled boss enrichment reaches record-scoped Preview fields', async ({ page }) => {
+  await page.goto('/')
+
+  await area(page, 'Sierraclara').click()
+  const beira = bossRecord(page, 'Beira, de la manada putrefacta')
+  await expect(recordField(beira, 'damage')).toHaveText('Físico · Frío')
+  await expect(recordField(beira, 'weaknesses')).toHaveText('Fuego')
+  await expect(recordField(beira, 'mechanics')).toContainText('nova de escarcha')
+  await expect(recordField(beira, 'rewards')).toContainText('+10 % a la resistencia al frío')
+  await expect(recordField(beira, 'verification')).toHaveText('Verificado')
+  await expect(recordField(beira, 'sources')).toContainText('Head_of_the_Winter_Wolf')
+  await expect(recordField(beira, 'verified-at')).toHaveText('2026-09-28')
+  await page.screenshot({ path: '/tmp/campaign-boss-enrichment-beira.png', fullPage: true })
+
+  await area(page, 'Cementerio de los eternos').click()
+  const lachlann = bossRecord(page, 'Lachlann del lamento eterno')
+  await expect(recordField(lachlann, 'damage')).toHaveText('Desconocido')
+  await expect(recordField(lachlann, 'weaknesses')).toHaveText('Desconocidas')
+  await expect(recordField(lachlann, 'mechanics')).toContainText('golpes cuerpo a cuerpo')
+
+  await area(page, 'Pueblo de Ogham').click()
+  const executioner = bossRecord(page, 'El verdugo')
+  await expect(recordField(executioner, 'resistances')).toHaveText('Fuego')
+  await expect(recordField(executioner, 'resistances')).not.toContainText('%')
+  await expect(recordField(executioner, 'mechanics')).toContainText('señalización previa')
+  await expect(recordField(executioner, 'rewards')).toContainText('Gema de habilidad sin tallar de nivel 5')
+
+  await area(page, 'Mansión de Ogham').click()
+  const geonor = bossRecord(page, 'El conde Geonor')
+  await expect(recordField(geonor, 'description')).toHaveText('Jefe final del Acto 1.')
+  await expect(recordField(geonor, 'resistances')).toHaveText('Frío')
+  await expect(recordField(geonor, 'resistances')).not.toContainText('%')
+  await expect(recordField(geonor, 'mechanics')).toContainText('seis embestidas desde la niebla')
+  await expect(recordField(geonor, 'rewards')).toContainText('Gema de asistencia sin tallar de nivel 1')
+  await page.screenshot({ path: '/tmp/campaign-boss-enrichment-geonor.png', fullPage: true })
 })
 
 test('validation failure suppresses every campaign UI component', async ({ page }) => {
